@@ -1,1 +1,1 @@
-from .permissions import IsAdmin, IsOwner
+from .permissions import IsAdminOrReadOnly, IsOwner
