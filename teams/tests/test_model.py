@@ -4,7 +4,7 @@ from teams.models import Team
 from model_bakery import baker
 
 
-class AnimalModelTest(TestCase):
+class TeamModelTest(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         cls.coach = baker.make("coachs.Coach")
@@ -14,7 +14,7 @@ class AnimalModelTest(TestCase):
             "teams.Team",
             coach=cls.coach,
             stadium=cls.stadium,
-            players=cls.players,
+            # players=cls.players,
         )
 
     def test_name_max_length(self):
@@ -49,10 +49,10 @@ class AnimalModelTest(TestCase):
 
         self.assertIs(self.stadium, self.team.stadium, msg)
 
-    def test_team_contain_many_player(self):
-        """Verificando se o `team` pode ter varios `player`"""
+    # def test_team_contain_many_player(self):
+    #     """Verificando se o `team` pode ter varios `player`"""
 
-        msg = "Verifique se os valores do campo `players` estão corretos"
+    #     msg = "Verifique se os valores do campo `players` estão corretos"
 
-        for player in self.players:
-            self.assertIn(player, self.teams.players.all(), msg)
+    #     for player in self.players:
+    #         self.assertIn(player, self.teams.players.all(), msg)
