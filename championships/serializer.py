@@ -15,4 +15,4 @@ class ChampionshipSerializer(serializers.ModelSerializer):
             "teams",
             "games",
         )
-        read_only_fields = ["initial_date", "end_date"]
+        # read_only_fields = ["initial_date", "end_date"]
