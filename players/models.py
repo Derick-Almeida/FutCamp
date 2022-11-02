@@ -2,6 +2,15 @@ from django.db import models
 import uuid
 
 
+class PositionPlayer(models.TextChoices):
+    GOLEIRO = "Goleiro"
+    ZAGUEIRO = "Zagueiro"
+    LATERAL = "Lateral"
+    MEIA = "Meia"
+    ATACANTE = "Atacante"
+    OTHER = "Jogador"
+
+
 class Player(models.Model):
     id = models.UUIDField(
         default=uuid.uuid4,
@@ -9,16 +18,23 @@ class Player(models.Model):
         editable=False,
     )
     name = models.CharField(max_length=255)
-    birth_date = models.DateField()
+    birthdate = models.DateField()
     age = models.IntegerField()
     hometown = models.CharField(max_length=150)
     # number_of_titles = models.IntegerField()
     biography = models.TextField()
     number_of_goals = models.IntegerField()
-    position = models.CharField(max_length=50)
+    position = models.CharField(
+        max_length=50,
+        choices=PositionPlayer.choices,
+        default=PositionPlayer.OTHER,
+    )
     shirt_number = models.IntegerField()
-    team = models.ForeignKey(
+    current_team = models.ForeignKey(
         "teams.Team",
         on_delete=models.CASCADE,
         related_name="players",
+        null=True,
+        blank=True,
+        default="Jogador Livre",
     )

@@ -14,3 +14,8 @@ class IsAdminOrReadOnly(permissions.BasePermission):
             or req.user.is_authenticated
             and req.user.is_superuser
         )
+
+
+class IsAdmin(permissions.BasePermission):
+    def has_permission(self, req: Request, view: View):
+        return req.user.is_authenticated and req.user.is_superuser
