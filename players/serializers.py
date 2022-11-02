@@ -32,7 +32,7 @@ class PlayerSerializer(serializers.ModelSerializer):
 
     def get_age(self, obj: Player) -> int:
         current_date = date.today()
-        player_birthdate = date.fromisoformat(obj.birthdate)
+        player_birthdate = obj.birthdate
 
         age = (
             current_date.year
@@ -44,3 +44,11 @@ class PlayerSerializer(serializers.ModelSerializer):
         )
 
         return age
+
+    # def validate_number_of_goals(self, value):
+    #     if value < 0:
+    #         raise serializers.ValidationError(
+    #             "number of goals must be greater than zero"
+    #         )
+
+    #     return value
