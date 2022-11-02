@@ -9,5 +9,7 @@ class Team(models.Model):
     team_foundation_year = models.DateField()
     updated_at = models.DateTimeField(auto_now=True)
 
-    coach = models.OneToOneField("coachs.Coach", on_delete=models.CASCADE)
+    coach = models.OneToOneField(
+        "coachs.Coach", on_delete=models.CASCADE, related_name="current_team"
+    )
     stadium = models.OneToOneField("stadiums.Stadium", on_delete=models.CASCADE)

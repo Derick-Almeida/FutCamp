@@ -1,14 +1,38 @@
 from rest_framework import serializers
+from datetime import date
+
+from teams.serializers import TeamSerializer
 from .models import Coach
 
+
 class CoachSerializer(serializers.ModelSerializer):
+    age = serializers.SerializerMethodField()
+    current_team = TeamSerializer(source="team", read_only=True)
+
     class Meta:
         model = Coach
-        fields = '__all__'
+        fields = (
+            "id",
+            "name",
+            "birthdate",
+            "age",
+            "biography",
+            "number_of_titles",
+            "hometown",
+            "current_team",
+        )
 
-    def create(self,validated_data):
-        return Coach.objects.create(**validated_data)
-        
+    def get_age(self, obj: Coach) -> int:
+        current_date = date.today()
+        coach_birthdate = obj.birthdate
 
+        age = (
+            current_date.year
+            - coach_birthdate.year
+            - (
+                (current_date.month, current_date.day)
+                < (coach_birthdate.month, coach_birthdate.day)
+            )
+        )
 
-    
+        return age

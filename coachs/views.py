@@ -1,23 +1,16 @@
-from rest_framework.generics import ListCreateAPIView,UpdateAPIView,DestroyAPIView,ListAPIView
+from rest_framework import generics
+
 from .serializers import CoachSerializer
 from .models import Coach
 
-class CreateListCoachView(ListCreateAPIView):
+
+class CreateListCoachView(generics.ListCreateAPIView):
     queryset = Coach.objects.all()
     serializer_class = CoachSerializer
 
 
-
-class GetUpdateDeleteCoachView(ListAPIView,UpdateAPIView,DestroyAPIView):
+class GetUpdateDeleteCoachView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CoachSerializer
-    def get_queryset(self):
-        queryset = Coach.objects.all()
-        coach_id = self.kwargs['pk']
-        queryset = queryset.filter(id=coach_id)
-        return queryset
+    queryset = Coach.objects.all()
 
-
-
-
-
-
+    lookup_url_kwarg = "coach_id"
