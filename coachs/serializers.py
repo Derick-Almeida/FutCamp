@@ -7,7 +7,7 @@ from .models import Coach
 
 class CoachSerializer(serializers.ModelSerializer):
     age = serializers.SerializerMethodField()
-    current_team = TeamSerializer(source="team", read_only=True)
+    current_team = TeamSerializer(read_only=True)
 
     class Meta:
         model = Coach

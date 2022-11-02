@@ -12,4 +12,9 @@ class Team(models.Model):
     coach = models.OneToOneField(
         "coachs.Coach", on_delete=models.CASCADE, related_name="current_team"
     )
-    stadium = models.OneToOneField("stadiums.Stadium", on_delete=models.CASCADE)
+    stadium = models.OneToOneField(
+        "stadiums.Stadium",
+        on_delete=models.CASCADE,
+        related_name="team_owner",
+        default=None,
+    )
