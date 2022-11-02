@@ -19,7 +19,7 @@ class Player(models.Model):
     )
     name = models.CharField(max_length=255)
     birthdate = models.DateField()
-    age = models.IntegerField()
+    # age = models.IntegerField()
     hometown = models.CharField(max_length=150)
     # number_of_titles = models.IntegerField()
     biography = models.TextField()
