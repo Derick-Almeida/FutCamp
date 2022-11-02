@@ -4,7 +4,7 @@ import uuid
 
 class Team(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     mascot = models.CharField(max_length=150)
     team_foundation_year = models.DateField()
     updated_at = models.DateTimeField(auto_now=True)

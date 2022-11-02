@@ -1,25 +1,25 @@
 from rest_framework import serializers
 from datetime import date
 
-from .models import Coach
-from .utils import TeamSerializer
+from coachs.models import Coach
+from stadiums.models import Stadium
+
+
+class StadiumSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Stadium
+
+        fields = [
+            "id",
+            "name",
+            "description",
+            "capacity",
+            "localizations",
+            "area",
+        ]
 
 
 class CoachSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Coach
-        fields = (
-            "id",
-            "name",
-            "birthdate",
-            "number_of_titles",
-            "hometown",
-            "current_team",
-        )
-
-
-class CoachDetailSerializer(serializers.ModelSerializer):
-    current_team = TeamSerializer(default=None)
     age = serializers.SerializerMethodField()
 
     class Meta:
@@ -32,7 +32,6 @@ class CoachDetailSerializer(serializers.ModelSerializer):
             "biography",
             "number_of_titles",
             "hometown",
-            "current_team",
         )
 
     def get_age(self, obj: Coach) -> int:

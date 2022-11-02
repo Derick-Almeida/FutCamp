@@ -7,6 +7,11 @@ class IsOwner(permissions.BasePermission):
         return bool(req.user.is_authenticated and obj == req.user)
 
 
+class IsAdmin(permissions.BasePermission):
+    def has_permission(self, req: Request, view: View):
+        return bool(req.user.is_authenticated and req.user.is_superuser)
+
+
 class IsAdminOrReadOnly(permissions.BasePermission):
     def has_permission(self, req: Request, view: View):
         return bool(

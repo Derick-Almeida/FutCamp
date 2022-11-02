@@ -1,26 +1,29 @@
+from rest_framework import generics
 from django.shortcuts import get_object_or_404
 from rest_framework.authentication import TokenAuthentication
-from rest_framework import generics
 
-from utils import IsAdminOrReadOnly
+from utils import IsAdminOrReadOnly, SerializerByMethodMixin
+from .serializers import TeamSerializer, TeamDetailSerializer
 from .services import validate_updated_fields
 
-from .serializers import TeamSerializer
 from stadiums.models import Stadium
 from coachs.models import Coach
 from .models import Team
 
 
-class TeamView(generics.ListCreateAPIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAdminOrReadOnly]
+class TeamView(SerializerByMethodMixin, generics.ListCreateAPIView):
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAdminOrReadOnly]
 
-    serializer_class = TeamSerializer
     queryset = Team.objects.all()
+    serializer_map = {
+        "GET": TeamSerializer,
+        "POST": TeamDetailSerializer,
+    }
 
     def perform_create(self, serializer):
-        coach_id = serializer.pop("coach_id")
-        stadium_id = serializer.pop("stadium_id")
+        coach_id = self.request.data.get("coach", None)
+        stadium_id = self.request.data.get("stadium", None)
 
         coach = get_object_or_404(Coach, id=coach_id)
         stadium = get_object_or_404(Stadium, id=stadium_id)
@@ -29,15 +32,13 @@ class TeamView(generics.ListCreateAPIView):
 
 
 class TeamDetailView(generics.RetrieveUpdateDestroyAPIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAdminOrReadOnly]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAdminOrReadOnly]
 
-    serializer_class = TeamSerializer
+    serializer_class = TeamDetailSerializer
     queryset = Team.objects.all()
 
     lookup_url_kwarg = "team_id"
 
     def perform_update(self, serializer):
-        validate_updated_fields(serializer)
-
-        serializer.save()
+        validate_updated_fields(self.request.data, serializer)

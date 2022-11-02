@@ -1,24 +1,27 @@
 from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAdminUser
 
+from utils import SerializerByMethodMixin, IsAdmin
 from .models import Stadium
-from .serializers import StadiumSerializer
+from .serializers import StadiumSerializer, StadiumDetailSerializer
 
 
-class StadiumView(generics.ListCreateAPIView):
+class StadiumView(SerializerByMethodMixin, generics.ListCreateAPIView):
     # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAdminUser]
+    # permission_classes = [IsAdmin]
 
-    serializer_class = StadiumSerializer
     queryset = Stadium.objects.all()
+    serializer_map = {
+        "GET": StadiumSerializer,
+        "POST": StadiumDetailSerializer,
+    }
 
 
 class StadiumDetailView(generics.RetrieveUpdateDestroyAPIView):
     # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAdminUser]
+    # permission_classes = [IsAdmin]
 
-    serializer_class = StadiumSerializer
+    serializer_class = StadiumDetailSerializer
     queryset = Stadium.objects.all()
 
     lookup_url_kwarg = "stadium_id"
