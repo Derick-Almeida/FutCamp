@@ -10,9 +10,3 @@ class Championship(models.Model):
     initial_date = models.DateField()
     end_date = models.DateField()
     award = models.FloatField()
-    teams = models.ForeignKey(
-        "teams.Team", related_name="championship", on_delete=models.CASCADE
-    )
-    games = models.ForeignKey(
-        "games.Game", related_name="championship", on_delete=models.CASCADE
-    )

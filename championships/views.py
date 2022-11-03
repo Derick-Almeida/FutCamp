@@ -11,22 +11,17 @@ from .models import Championship
 
 class ChampionshipView(generics.ListCreateAPIView):
 
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAdminUser]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAdminUser]
 
     serializer_class = ChampionshipSerializer
     queryset = Championship.objects.all()
 
-    def perform_create(self, serializer):
-        get_object_or_404(Team, self.request.teams["id"])
-        get_object_or_404(Game, self.request.games["id"])
-        serializer.save(self.request)
-
 
 class ChampionshipDetailView(generics.RetrieveUpdateDestroyAPIView):
 
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAdminUser]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAdminUser]
 
     serializer_class = ChampionshipSerializer
     queryset = Championship.objects.all()
@@ -34,5 +29,4 @@ class ChampionshipDetailView(generics.RetrieveUpdateDestroyAPIView):
     lookup_url_kwarg = "championships_id"
 
     def perform_create(self, serializer):
-        get_object_or_404(Championship, self.kwargs["championships_id"])
         serializer.save(championships_id=self.kwargs["championships_id"])

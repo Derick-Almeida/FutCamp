@@ -24,23 +24,21 @@ class Test_Championship(TestCase):
 
     def test_create_championship(self):
 
-        superUser = {
-            "username": "gabriel",
-            "password": "1234"
-        }
+        # superUser = {
+        #     "username": "gabriel",
+        #     "password": "1234"
+        # }
 
-        token = self.client.post(self.URL_login, superUser)
+        # token = self.client.post(self.URL_login, superUser)
 
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + token.data["token"])
+        # self.client.credentials(HTTP_AUTHORIZATION="Token " + token.data["token"])
 
         championships_obj = {
             "name": "c",
             "description": "description",
-            "initial_date": "01-01-2003",
-            "end_date": "end_date",
-            "award": "9,2",
-            "teams": "1",
-            "games": "2",
+            "initial_date": "20030-1-01",
+            "end_date": "2003-02-03",
+            "award": 9.2,
         }
 
         championships_data = self.client.post(**championships_obj)
@@ -52,14 +50,14 @@ class Test_Championship(TestCase):
 
     def test_possibles_errors_the_championship(self):
 
-        superUser = {
-            "username": "gabriel",
-            "password": "1234"
-        }
+        # superUser = {
+        #     "username": "gabriel",
+        #     "password": "1234"
+        # }
 
-        token = self.client.post(self.URL_login, superUser)
+        # token = self.client.post(self.URL_login, superUser)
 
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + token.data["token"])
+        # self.client.credentials(HTTP_AUTHORIZATION="Token " + token.data["token"])
 
         championships_obj_error = {}
 
