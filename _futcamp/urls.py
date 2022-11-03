@@ -24,6 +24,8 @@ from drf_spectacular.views import (
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/", include("users.urls")),
+    path("api/", include("championships.urls")),
     path("api/", include("teams.urls")),
     path("api/", include("coachs.urls")),
     path("api/", include("stadiums.urls")),

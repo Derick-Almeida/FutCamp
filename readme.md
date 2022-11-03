@@ -29,6 +29,12 @@ source ./venv/Scripts/activate
 pip install -r requirements.txt
 ```
 
+### Instale o pip 22.3
+
+```
+python.exe -m pip install --upgrade pip
+```
+
 ### Execute as migrações
 
 ```
@@ -62,3 +68,4 @@ coverage run ./manage.py test
 ```
 coverage report
 ```
+
