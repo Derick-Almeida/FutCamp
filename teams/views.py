@@ -4,7 +4,7 @@ from rest_framework.authentication import TokenAuthentication
 
 from utils import IsAdminOrReadOnly, SerializerByMethodMixin
 from .serializers import TeamSerializer, TeamDetailSerializer
-from .services import validate_updated_fields
+from .services import validate_team_fields
 
 from stadiums.models import Stadium
 from coachs.models import Coach
@@ -22,13 +22,7 @@ class TeamView(SerializerByMethodMixin, generics.ListCreateAPIView):
     }
 
     def perform_create(self, serializer):
-        coach_id = self.request.data.get("coach", None)
-        stadium_id = self.request.data.get("stadium", None)
-
-        coach = get_object_or_404(Coach, id=coach_id)
-        stadium = get_object_or_404(Stadium, id=stadium_id)
-
-        serializer.save(coach=coach, stadium=stadium)
+        validate_team_fields(self.request.data, serializer)
 
 
 class TeamDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -41,4 +35,4 @@ class TeamDetailView(generics.RetrieveUpdateDestroyAPIView):
     lookup_url_kwarg = "team_id"
 
     def perform_update(self, serializer):
-        validate_updated_fields(self.request.data, serializer)
+        validate_team_fields(self.request.data, serializer)

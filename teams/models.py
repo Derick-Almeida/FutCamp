@@ -10,11 +10,18 @@ class Team(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     coach = models.OneToOneField(
-        "coachs.Coach", on_delete=models.CASCADE, related_name="current_team"
+        "coachs.Coach",
+        on_delete=models.CASCADE,
+        related_name="current_team",
+        null=True,
+        blank=True,
+        default=None,
     )
     stadium = models.OneToOneField(
         "stadiums.Stadium",
         on_delete=models.CASCADE,
         related_name="team_owner",
+        null=True,
+        blank=True,
         default=None,
     )
