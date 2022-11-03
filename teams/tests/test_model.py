@@ -49,10 +49,10 @@ class TeamModelTest(TestCase):
 
         self.assertIs(self.stadium, self.team.stadium, msg)
 
-    # def test_team_contain_many_player(self):
-    #     """Verificando se o `team` pode ter varios `player`"""
+    def test_team_contain_many_player(self):
+        """Verificando se o `team` pode ter varios `player`"""
 
-    #     msg = "Verifique se os valores do campo `players` estão corretos"
+        msg = "Verifique se os valores do campo `players` estão corretos"
 
-    #     for player in self.players:
-    #         self.assertIn(player, self.teams.players.all(), msg)
+        for player in self.players:
+            self.assertIn(player, self.teams.players.all(), msg)
