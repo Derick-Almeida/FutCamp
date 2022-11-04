@@ -2,10 +2,12 @@ from rest_framework import serializers
 from datetime import date
 
 from .models import Coach
-from .utils import TeamSerializer
+from .utils import TeamSerializer, TitleSerializer
 
 
 class CoachSerializer(serializers.ModelSerializer):
+    number_of_titles = serializers.SerializerMethodField()
+
     class Meta:
         model = Coach
         fields = (
@@ -17,10 +19,15 @@ class CoachSerializer(serializers.ModelSerializer):
             "current_team",
         )
 
+    def get_number_of_titles(self, obj: Coach) -> int:
+        return obj.titles.all().count()
+
 
 class CoachDetailSerializer(serializers.ModelSerializer):
+    number_of_titles = serializers.SerializerMethodField()
     current_team = TeamSerializer(default=None)
     age = serializers.SerializerMethodField()
+    titles = TitleSerializer(many=True, read_only=True)
 
     class Meta:
         model = Coach
@@ -31,6 +38,7 @@ class CoachDetailSerializer(serializers.ModelSerializer):
             "age",
             "biography",
             "number_of_titles",
+            "titles",
             "hometown",
             "current_team",
         )
@@ -49,3 +57,6 @@ class CoachDetailSerializer(serializers.ModelSerializer):
         )
 
         return age
+
+    def get_number_of_titles(self, obj: Coach) -> int:
+        return obj.titles.all().count()

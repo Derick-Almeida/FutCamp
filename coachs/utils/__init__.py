@@ -1,1 +1,1 @@
-from .base_serializers import TeamSerializer
+from .base_serializers import TeamSerializer, TitleSerializer
