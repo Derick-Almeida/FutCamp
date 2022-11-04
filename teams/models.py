@@ -25,3 +25,11 @@ class Team(models.Model):
         blank=True,
         default=None,
     )
+    championship = models.ForeignKey(
+        "championships.Championship",
+        on_delete=models.CASCADE,
+        related_name="teams",
+        null=True,
+        blank=True,
+        default=None,
+    )
