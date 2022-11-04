@@ -1,47 +1,51 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 import uuid
-from django.contrib.auth.models import AbstractUser
+
+from .utils import UserManager
+
 
 class GenreChoices(models.TextChoices):
-    HOMEM = "Homem"
-    MULHER = "Mulher"
-    NÃO_BINARIE = "Não Binárie"
+    MASCULINO = "Masculino"
+    FEMININO = "Feminino"
+    TRANSGENERO = "Transgênero"
+    GENERO_NEUTRO = "Gênero neutro"
+    NO_BINARIE = "Não Binário"
+    AGENERO = "Agênero"
+    PANGENERO = "Pangênero"
     OTHER = "Não informado"
 
 
 class User(AbstractUser):
-    id = models.UUIDField(
-        default=uuid.uuid4,
-        primary_key=True,
-        editable=False,
-    )
-    name = models.CharField(max_length = 255)
-    email = models.EmailField(max_length = 255, unique = True)
-    password = models.CharField(max_length = 255)
-    birth_date = models.DateField(null = False)
-    is_superuser = models.BooleanField(default = False)
-    is_active = models.BooleanField(default = True)
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
+    username = None
+    name = models.CharField(max_length=255)
+    email = models.EmailField(max_length=255, unique=True)
+    password = models.CharField(max_length=255)
+    birthdate = models.DateField(null=False)
     genre = models.CharField(
-        max_length = 50,
-        choices = GenreChoices.choices,
-        default = GenreChoices.OTHER)
-    created_at = models.DateField(auto_now_add = True)
-    updated_at = models.DateField(auto_now = True, null = True, blank = True)
-    favorite_teams = models.ForeignKey(
-        'teams.Team',
-        on_delete = models.CASCADE,
-        related_name = "Teams",
-        null = True
+        max_length=50, choices=GenreChoices.choices, default=GenreChoices.OTHER
     )
-    favorite_players = models.ForeignKey(
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    favorite_teams = models.ManyToManyField(
+        "teams.Team",
+        blank=True,
+        related_name="users",
+    )
+    favorite_players = models.ManyToManyField(
         "players.Player",
-        on_delete = models.CASCADE,
-        related_name = "Players",
-        null = True
+        blank=True,
+        related_name="users",
     )
-    favorite_championships = models.ForeignKey(
+    favorite_championships = models.ManyToManyField(
         "championships.Championship",
-        on_delete = models.CASCADE,
-        related_name = "Championships",
-        null = True
+        blank=True,
+        related_name="users",
     )
+
+    objects = UserManager()
+
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
