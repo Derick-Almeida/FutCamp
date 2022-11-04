@@ -57,6 +57,7 @@ MY_APPS = [
     "players",
     "stadiums",
     "championships",
+    "titles",
     "users.apps.UsersConfig",
 ]
 
