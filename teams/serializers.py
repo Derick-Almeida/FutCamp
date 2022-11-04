@@ -2,12 +2,15 @@ from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 
 from .models import Team
+from titles.models import Title
 from players.models import Player
-from .utils import StadiumSerializer, CoachSerializer, PlayerSerializer
+from .utils import StadiumSerializer, CoachSerializer, PlayerSerializer, TitleSerializer
+from .services import create_team, update_team
 
 
 class TeamSerializer(serializers.ModelSerializer):
     number_of_players = serializers.SerializerMethodField()
+    number_of_titles = serializers.SerializerMethodField()
 
     class Meta:
         model = Team
@@ -17,6 +20,7 @@ class TeamSerializer(serializers.ModelSerializer):
             "name",
             "mascot",
             "number_of_players",
+            "number_of_titles",
             "team_foundation_year",
             "updated_at",
             "stadium",
@@ -26,12 +30,17 @@ class TeamSerializer(serializers.ModelSerializer):
     def get_number_of_players(self, obj: Team) -> int:
         return obj.players.all().count()
 
+    def get_number_of_titles(self, obj: Team) -> int:
+        return obj.titles.all().count()
+
 
 class TeamDetailSerializer(serializers.ModelSerializer):
     coach = CoachSerializer(read_only=True)
     stadium = StadiumSerializer(read_only=True)
     players = PlayerSerializer(many=True, read_only=True)
+    titles = TitleSerializer(many=True, read_only=True)
     number_of_players = serializers.SerializerMethodField()
+    number_of_titles = serializers.SerializerMethodField()
 
     class Meta:
         model = Team
@@ -41,8 +50,10 @@ class TeamDetailSerializer(serializers.ModelSerializer):
             "name",
             "mascot",
             "number_of_players",
+            "number_of_titles",
             "team_foundation_year",
             "updated_at",
+            "titles",
             "stadium",
             "coach",
             "players",
@@ -51,18 +62,11 @@ class TeamDetailSerializer(serializers.ModelSerializer):
     def get_number_of_players(self, obj: Team) -> int:
         return obj.players.all().count()
 
-    def create(self, validated_data):
-        list_keys = validated_data.keys()
-        player_list = []
+    def get_number_of_titles(self, obj: Team) -> int:
+        return obj.titles.all().count()
 
-        if "players" in list_keys:
-            players = validated_data.pop("players")
+    def create(self, validated_data: dict) -> Team:
+        return create_team(validated_data)
 
-            for player_id in players:
-                player = get_object_or_404(Player, id=player_id)
-                player_list.append(player)
-
-        team = Team.objects.create(**validated_data)
-        team.players.set(player_list)
-
-        return team
+    def update(self, instance: Team, validated_data: dict) -> Team:
+        return update_team(instance, validated_data)

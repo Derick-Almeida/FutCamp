@@ -1,13 +1,10 @@
 from rest_framework import generics
-from django.shortcuts import get_object_or_404
 from rest_framework.authentication import TokenAuthentication
 
 from utils import IsAdminOrReadOnly, SerializerByMethodMixin
 from .serializers import TeamSerializer, TeamDetailSerializer
 from .services import validate_team_fields
 
-from stadiums.models import Stadium
-from coachs.models import Coach
 from .models import Team
 
 

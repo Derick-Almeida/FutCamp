@@ -4,8 +4,10 @@ from titles.models import Title
 
 
 class TitleSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Title
-        fields = '__all__'
-        
+        fields = (
+            "id",
+            "name",
+            "year_of_conquest",
+        )

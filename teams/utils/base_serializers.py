@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from datetime import date
 
+from titles.models import Title
 from coachs.models import Coach
 from players.models import Player
 from stadiums.models import Stadium
@@ -65,4 +66,14 @@ class PlayerSerializer(serializers.ModelSerializer):
             "number_of_goals",
             "position",
             "shirt_number",
+        )
+
+
+class TitleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Title
+        fields = (
+            "id",
+            "name",
+            "year_of_conquest",
         )
