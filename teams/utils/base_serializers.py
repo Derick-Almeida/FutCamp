@@ -23,6 +23,7 @@ class StadiumSerializer(serializers.ModelSerializer):
 
 class CoachSerializer(serializers.ModelSerializer):
     age = serializers.SerializerMethodField()
+    number_of_titles = serializers.SerializerMethodField()
 
     class Meta:
         model = Coach
@@ -31,10 +32,13 @@ class CoachSerializer(serializers.ModelSerializer):
             "name",
             "birthdate",
             "age",
-            "biography",
             "number_of_titles",
             "hometown",
+            "current_team",
         )
+
+    def get_number_of_titles(self, obj: Coach) -> int:
+        return obj.titles.all().count()
 
     def get_age(self, obj: Coach) -> int:
         current_date = date.today()

@@ -3,6 +3,7 @@ from rest_framework import serializers
 from teams.models import Team
 from players.models import Player
 from stadiums.models import Stadium
+from titles.models import Title
 
 
 class StadiumSerializer(serializers.ModelSerializer):
@@ -57,3 +58,13 @@ class TeamSerializer(serializers.ModelSerializer):
 
     def get_number_of_players(self, obj: Team) -> int:
         return obj.players.all().count()
+
+
+class TitleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Title
+        fields = (
+            "id",
+            "name",
+            "year_of_conquest",
+        )
