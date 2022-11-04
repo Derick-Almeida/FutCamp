@@ -1,34 +1,37 @@
 from rest_framework import generics
-from rest_framework.views import APIView, Request, Response, status
-from django.shortcuts import get_object_or_404
 
 from .models import User
+from .serializers import UserSerializer, UserDetailSerializer
 
-from .serializers import UserSerializer
 
-class UserCreateView(generics.ListCreateAPIView):
+class UserCreateView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserDetailSerializer
+
+
+class UserListView(generics.ListAPIView):
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = []
+
+    queryset = User.objects.all()
     serializer_class = UserSerializer
-    queryset = User.objects
 
-class UserIDView(APIView):
-    def get (self, request: Request, user_id: str) -> Response:
 
-        user_by_id = get_object_or_404(User, id = user_id)
+class UserDetailView(generics.RetrieveUpdateAPIView):
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = []
 
-        serializer = UserSerializer(user_by_id)
+    serializer_class = UserDetailSerializer
+    queryset = User.objects.all()
 
-        return Response(serializer.data, status.HTTP_200_OK)
-    
-    def patch (self, request: Request, user_id: str) -> Response:
+    lookup_url_kwarg = "user_id"
 
-        user_by_id = get_object_or_404(User, id = user_id)
 
-        for key, value in request.data.items():
-            setattr(user_by_id, key, value)
-        
-        user_by_id.save()
+class EnableDisableUserView(generics.UpdateAPIView):
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = []
 
-        serializer = UserSerializer(user_by_id)
+    serializer_class = UserDetailSerializer
+    queryset = User.objects.all()
 
-        return Response(serializer.data, status.HTTP_200_OK)
-
+    lookup_url_kwarg = "user_id"
