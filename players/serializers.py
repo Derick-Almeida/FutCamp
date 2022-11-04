@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from players.models import Player
-from teams.models import Team
 
 from datetime import date
 
@@ -27,7 +26,7 @@ class PlayerSerializer(serializers.ModelSerializer):
 class PlayerDetailSerializer(serializers.ModelSerializer):
     age = serializers.SerializerMethodField()
     number_of_goals = serializers.IntegerField(min_value=0)
-    current_team = TeamSerializer()
+    current_team = TeamSerializer(read_only=True)
 
     class Meta:
         model = Player
