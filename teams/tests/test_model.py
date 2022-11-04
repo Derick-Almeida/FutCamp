@@ -14,7 +14,7 @@ class TeamModelTest(TestCase):
             "teams.Team",
             coach=cls.coach,
             stadium=cls.stadium,
-            # players=cls.players,
+            players=cls.players,
         )
 
     def test_name_max_length(self):
@@ -55,4 +55,4 @@ class TeamModelTest(TestCase):
         msg = "Verifique se os valores do campo `players` estão corretos"
 
         for player in self.players:
-            self.assertIn(player, self.teams.players.all(), msg)
+            self.assertIn(player, self.team.players.all(), msg)

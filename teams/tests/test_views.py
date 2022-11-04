@@ -22,14 +22,14 @@ class TeamViewTests(APITestCase):
         }
         cls.team_update_data = {"name": "Itaquaquecetuba", "mascot": "Capivara"}
         cls.normal_user_data = {
-            "username": "guilhermina",
+            "name": "guilhermina",
             "email": "guilhermina@mail.com",
             "password": "123456",
             "birthdate": "1999-09-09",
             "genre": "Feminino",
         }
         cls.superuser_data = {
-            "username": "Adamastor",
+            "name": "Adamastor",
             "email": "adamastor@mail.com",
             "password": "123456",
             "birthdate": "1999-09-09",
@@ -43,8 +43,10 @@ class TeamViewTests(APITestCase):
             "name",
             "mascot",
             "number_of_players",
+            "number_of_titles",
             "team_foundation_year",
             "updated_at",
+            "titles",
             "players",
             "coach",
             "stadium",
