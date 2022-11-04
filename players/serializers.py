@@ -3,11 +3,12 @@ from players.models import Player
 
 from datetime import date
 
-from .utils import TeamSerializer
+from .utils import TeamSerializer, TitleSerializer
 
 
 class PlayerSerializer(serializers.ModelSerializer):
     number_of_goals = serializers.IntegerField(min_value=0)
+    number_of_titles = serializers.SerializerMethodField()
 
     class Meta:
         model = Player
@@ -17,16 +18,22 @@ class PlayerSerializer(serializers.ModelSerializer):
             "birthdate",
             "hometown",
             "number_of_goals",
+            "number_of_titles",
             "position",
             "shirt_number",
             "current_team",
         )
+
+    def get_number_of_titles(self, obj: Player) -> int:
+        return obj.titles.all().count()
 
 
 class PlayerDetailSerializer(serializers.ModelSerializer):
     age = serializers.SerializerMethodField()
     number_of_goals = serializers.IntegerField(min_value=0)
     current_team = TeamSerializer(read_only=True)
+    number_of_titles = serializers.SerializerMethodField()
+    titles = TitleSerializer(many=True, read_only=True)
 
     class Meta:
         model = Player
@@ -38,6 +45,8 @@ class PlayerDetailSerializer(serializers.ModelSerializer):
             "hometown",
             "biography",
             "number_of_goals",
+            "number_of_titles",
+            "titles",
             "position",
             "shirt_number",
             "current_team",
@@ -58,10 +67,5 @@ class PlayerDetailSerializer(serializers.ModelSerializer):
 
         return age
 
-    # def validate_number_of_goals(self, value):
-    #     if value < 0:
-    #         raise serializers.ValidationError(
-    #             "number of goals must be greater than zero"
-    #         )
-
-    #     return value
+    def get_number_of_titles(self, obj: Player) -> int:
+        return obj.titles.all().count()

@@ -7,5 +7,4 @@ class Coach(models.Model):
     name = models.CharField(max_length=255)
     birthdate = models.DateField()
     biography = models.CharField(max_length=500)
-    number_of_titles = models.PositiveIntegerField()
     hometown = models.CharField(max_length=50)
