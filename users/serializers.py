@@ -22,9 +22,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
-    favorite_teams = TeamSerializer(many=True, read_only=True)
-    favorite_players = PlayerSerializer(many=True, read_only=True)
-    favorite_championships = ChampionshipSerializer(many=True, read_only=True)
+    # favorite_teams = TeamSerializer(many=True, read_only=True)
+    # favorite_players = PlayerSerializer(many=True, read_only=True)
+    # favorite_championships = ChampionshipSerializer(many=True, read_only=True)
 
     class Meta:
         model = User
@@ -39,9 +39,9 @@ class UserDetailSerializer(serializers.ModelSerializer):
             "is_active",
             "created_at",
             "updated_at",
-            "favorite_teams",
-            "favorite_players",
-            "favorite_championships",
+            # "favorite_teams",
+            # "favorite_players",
+            # "favorite_championships",
         )
 
         write_only_fields = ["password"]
@@ -53,3 +53,8 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
+
+
+class Loginserializer(serializers.Serializer):
+    email = serializers.EmailField(write_only=True)
+    password = serializers.CharField(write_only=True)
