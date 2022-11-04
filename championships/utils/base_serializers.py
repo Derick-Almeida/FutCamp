@@ -15,6 +15,8 @@ class StadiumSerializer(serializers.ModelSerializer):
 
 
 class CoachSerializer(serializers.ModelSerializer):
+    number_of_titles = serializers.SerializerMethodField()
+
     class Meta:
         model = Coach
         fields = (
@@ -23,6 +25,9 @@ class CoachSerializer(serializers.ModelSerializer):
             "number_of_titles",
             "hometown",
         )
+
+    def get_number_of_titles(self, obj: Coach) -> int:
+        return obj.titles.all().count()
 
 
 class TeamSerializer(serializers.ModelSerializer):

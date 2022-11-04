@@ -51,13 +51,13 @@ THIRD_PARTY_APPS = [
 ]
 
 MY_APPS = [
-    "games",
     "teams",
     "coachs",
     "players",
     "stadiums",
     "championships",
     "titles",
+    "games",
     "users.apps.UsersConfig",
 ]
 
