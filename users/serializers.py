@@ -33,6 +33,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "email",
+            "password",
             "birthdate",
             "genre",
             "is_superuser",
@@ -43,8 +44,8 @@ class UserDetailSerializer(serializers.ModelSerializer):
             # "favorite_players",
             # "favorite_championships",
         )
+        extra_kwargs = {"password": {"write_only": True}}
 
-        write_only_fields = ["password"]
         read_only_fields = [
             "created_at",
             "updated_at",

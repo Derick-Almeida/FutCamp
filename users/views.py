@@ -7,10 +7,8 @@ from django.contrib.auth import authenticate
 
 # from users.utils import email_verificate
 
-from django.shortcuts import get_object_or_404
 from .models import User
 from rest_framework.views import APIView, Response, status
-from django.contrib.auth.hashers import make_password
 from rest_framework.authtoken.models import Token
 
 
@@ -52,21 +50,12 @@ class loginView(APIView):
         serializer = Loginserializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        user = authenticate(
-            username=serializer.validated_data.get("email"),
-            password=serializer.validated_data.get("password"),
-        )
-        username = (serializer.validated_data.get("email"),)
-        password = (serializer.validated_data.get("password"),)
-        print(user)
-        print("=" * 100)
-        print(username)
-        print("=" * 100)
-        print(password)
+        user = authenticate(**serializer.validated_data)
 
         if not user:
             return Response(
                 {"detail": "invalid credentials"}, status.HTTP_403_FORBIDDEN
             )
         token, _ = Token.objects.get_or_create(user=user)
+
         return Response({"token": token.key})
