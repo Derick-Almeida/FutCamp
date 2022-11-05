@@ -22,9 +22,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
-    # favorite_teams = TeamSerializer(many=True, read_only=True)
-    # favorite_players = PlayerSerializer(many=True, read_only=True)
-    # favorite_championships = ChampionshipSerializer(many=True, read_only=True)
+    favorite_teams = TeamSerializer(many=True, read_only=True)
+    favorite_players = PlayerSerializer(many=True, read_only=True)
+    favorite_championships = ChampionshipSerializer(many=True, read_only=True)
 
     class Meta:
         model = User
@@ -40,9 +40,9 @@ class UserDetailSerializer(serializers.ModelSerializer):
             "is_active",
             "created_at",
             "updated_at",
-            # "favorite_teams",
-            # "favorite_players",
-            # "favorite_championships",
+            "favorite_teams",
+            "favorite_players",
+            "favorite_championships",
         )
         extra_kwargs = {"password": {"write_only": True}}
 

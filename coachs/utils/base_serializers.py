@@ -29,7 +29,6 @@ class PlayerSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "name",
-            "birthdate",
             "hometown",
             "number_of_goals",
             "position",

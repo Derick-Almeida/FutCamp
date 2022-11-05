@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from datetime import date
 
 from teams.models import Team
 from players.models import Player

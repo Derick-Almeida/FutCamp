@@ -1,34 +1,34 @@
 from rest_framework import generics
-
-from games.models import Game
-from games.serializers import GameSerializer
-
 from rest_framework.authentication import TokenAuthentication
 
-from utils.permissions import IsAdmin, IsAdminOrReadOnly, IsOwner
+from .models import Game
+from .serializers import GameSerializer, GameDetailSerializer
+from utils import IsAdminOrReadOnly, SerializerByMethodMixin
 
 
-class GameView(generics.ListCreateAPIView):
+class GameView(SerializerByMethodMixin, generics.ListCreateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAdminOrReadOnly]
+
     queryset = Game.objects.all()
-    serializer_class = GameSerializer
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAdminOrReadOnly]
+    serializer_map = {
+        "GET": GameSerializer,
+        "POST": GameDetailSerializer,
+    }
 
     def perform_create(self, serializer):
         stadium = self.request.data["stadium"]
         teams = self.request.data["teams"]
         championship = self.request.data["championship"]
-        # import pdb
-
-        # pdb.set_trace()
 
         serializer.save(stadium=stadium, teams=teams, championship=championship)
 
 
 class GameDetailView(generics.RetrieveUpdateDestroyAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAdminOrReadOnly]
+
     queryset = Game.objects.all()
     serializer_class = GameSerializer
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAdminOrReadOnly]
 
     lookup_url_kwarg = "game_id"

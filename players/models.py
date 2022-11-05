@@ -12,11 +12,7 @@ class PositionPlayer(models.TextChoices):
 
 
 class Player(models.Model):
-    id = models.UUIDField(
-        default=uuid.uuid4,
-        primary_key=True,
-        editable=False,
-    )
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     name = models.CharField(max_length=255)
     birthdate = models.DateField()
     hometown = models.CharField(max_length=150)
@@ -28,6 +24,7 @@ class Player(models.Model):
         default=PositionPlayer.OTHER,
     )
     shirt_number = models.IntegerField()
+
     current_team = models.ForeignKey(
         "teams.Team",
         on_delete=models.CASCADE,

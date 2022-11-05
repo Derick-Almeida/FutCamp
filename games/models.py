@@ -3,13 +3,10 @@ import uuid
 
 
 class Game(models.Model):
-    id = models.UUIDField(
-        default=uuid.uuid4,
-        primary_key=True,
-        editable=False,
-    )
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     date = models.DateTimeField()
     result = models.CharField(max_length=150)
+
     stadium = models.ForeignKey(
         "stadiums.Stadium",
         on_delete=models.CASCADE,
@@ -23,8 +20,4 @@ class Game(models.Model):
         "championships.Championship",
         related_name="games",
         on_delete=models.CASCADE,
-        # Nulo temporario
-        null=True,
-        blank=True,
-        default=None,
     )

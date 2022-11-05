@@ -22,40 +22,25 @@ class StadiumSerializer(serializers.ModelSerializer):
 
 
 class CoachSerializer(serializers.ModelSerializer):
-    age = serializers.SerializerMethodField()
+    number_of_titles = serializers.SerializerMethodField()
 
     class Meta:
         model = Coach
         fields = (
             "id",
             "name",
-            "birthdate",
-            "age",
-            "biography",
             "number_of_titles",
             "hometown",
         )
 
-    def get_age(self, obj: Coach) -> int:
-        current_date = date.today()
-        coach_birthdate = obj.birthdate
-
-        age = (
-            current_date.year
-            - coach_birthdate.year
-            - (
-                (current_date.month, current_date.day)
-                < (coach_birthdate.month, coach_birthdate.day)
-            )
-        )
-
-        return age
+    def get_number_of_titles(self, obj: Coach) -> int:
+        return obj.titles.all().count()
 
 
 class TeamSerializer(serializers.ModelSerializer):
     coach = CoachSerializer(read_only=True)
-    stadium = StadiumSerializer(read_only=True)
     number_of_players = serializers.SerializerMethodField()
+    number_of_titles = serializers.SerializerMethodField()
 
     class Meta:
         model = Team
@@ -65,14 +50,17 @@ class TeamSerializer(serializers.ModelSerializer):
             "name",
             "mascot",
             "number_of_players",
+            "number_of_titles",
             "team_foundation_year",
             "updated_at",
-            "stadium",
             "coach",
         )
 
     def get_number_of_players(self, obj: Team) -> int:
         return obj.players.all().count()
+
+    def get_number_of_titles(self, obj: Team) -> int:
+        return obj.titles.all().count()
 
 
 class TitleSerializer(serializers.ModelSerializer):

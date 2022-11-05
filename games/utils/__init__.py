@@ -1,7 +1,1 @@
-from .base_serializers import (
-    CoachSerializer,
-    StadiumSerializer,
-    TeamSerializer,
-    PlayerSerializer,
-    ChampionshipSerializer,
-)
+from .base_serializers import StadiumSerializer, TeamSerializer, ChampionshipSerializer
