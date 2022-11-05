@@ -24,26 +24,26 @@ class User(AbstractUser):
     password = models.CharField(max_length=255)
     birthdate = models.DateField(null=False)
     genre = models.CharField(
-        max_length=50, choices=GenreChoices.choices, default=GenreChoices.OTHER
+        max_length=560, choices=GenreChoices.choices, default=GenreChoices.OTHER
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    favorite_teams = models.ManyToManyField(
-        "teams.Team",
-        blank=True,
-        related_name="users",
-    )
-    favorite_players = models.ManyToManyField(
-        "players.Player",
-        blank=True,
-        related_name="users",
-    )
-    favorite_championships = models.ManyToManyField(
-        "championships.Championship",
-        blank=True,
-        related_name="users",
-    )
+    # favorite_teams = models.ManyToManyField(
+    #     "teams.Team",
+    #     blank=True,
+    #     related_name="users",
+    # )
+    # favorite_players = models.ManyToManyField(
+    #     "players.Player",
+    #     blank=True,
+    #     related_name="users",
+    # )
+    # favorite_championships = models.ManyToManyField(
+    #     "championships.Championship",
+    #     blank=True,
+    #     related_name="users",
+    # )
 
     objects = UserManager()
 

@@ -48,16 +48,17 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     "rest_framework",
     "drf_spectacular",
+    "rest_framework.authtoken",
 ]
 
 MY_APPS = [
-    "games",
     "teams",
     "coachs",
     "players",
     "stadiums",
     "championships",
     "titles",
+    "games",
     "users.apps.UsersConfig",
 ]
 
