@@ -20,15 +20,21 @@ class StadiumSerializer(serializers.ModelSerializer):
 
 
 class TeamSerializer(serializers.ModelSerializer):
+    number_of_titles = serializers.SerializerMethodField()
+
     class Meta:
         model = Team
 
         fields = (
             "id",
             "name",
+            "number_of_titles",
             "coach",
             "stadium",
         )
+
+    def get_number_of_titles(self, obj: Team) -> int:
+        return obj.titles.all().count()
 
 
 class ChampionshipSerializer(serializers.ModelSerializer):

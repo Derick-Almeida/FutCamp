@@ -4,8 +4,12 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 
-from utils import IsAdmin, IsAdminOrReadOnly, IsOwner
-from .serializers import UserSerializer, UserDetailSerializer
+from utils import IsAdmin, IsOwner
+from .serializers import (
+    UserSerializer,
+    UserDetailSerializer,
+    UserEnableDisableSerializer,
+)
 from .serializers import Loginserializer
 from .models import User
 
@@ -37,7 +41,7 @@ class EnableDisableUserView(generics.UpdateAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAdmin]
 
-    serializer_class = UserDetailSerializer
+    serializer_class = UserEnableDisableSerializer
     queryset = User.objects.all()
 
     lookup_url_kwarg = "user_id"

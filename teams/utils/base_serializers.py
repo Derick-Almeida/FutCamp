@@ -39,6 +39,7 @@ class CoachSerializer(serializers.ModelSerializer):
 
 class PlayerSerializer(serializers.ModelSerializer):
     number_of_goals = serializers.IntegerField(min_value=0)
+    number_of_titles = serializers.SerializerMethodField()
 
     class Meta:
         model = Player
@@ -47,9 +48,13 @@ class PlayerSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "number_of_goals",
+            "number_of_titles",
             "position",
             "shirt_number",
         )
+
+    def get_number_of_titles(self, obj: Player) -> int:
+        return obj.titles.all().count()
 
 
 class TitleSerializer(serializers.ModelSerializer):
