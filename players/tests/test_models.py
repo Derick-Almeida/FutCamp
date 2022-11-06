@@ -13,22 +13,20 @@ class PlayerModelTest(TestCase):
         cls.player = {
             "name": "Gabriel Barbosa",
             "birthdate": "1996-10-14",
-            "age": 25,
             "hometown": "Santos-SP",
-            # "number_of_titles": 5,
             "biography": "Decidiu duas libertadores para o Flamengo",
             "number_of_goals": 200,
             "position": "Atacante",
             "shirt_number": 10,
         }
 
-        cls.team = {
-            baker.make("teams.Team"),
-        }
+        cls.team = [baker.make("teams.Team")],
 
+        # import ipdb
+        # ipdb.set_trace()
         cls.player_created = Player.objects.create(
             **cls.player,
-            current_team=cls.team,
+            current_team=cls.team[0].__getitem__(0),
         )
 
     def test_name_max_length(self):

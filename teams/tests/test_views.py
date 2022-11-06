@@ -9,17 +9,20 @@ from teams.models import Team
 class TeamViewTests(APITestCase):
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.coach = baker.make("coachs.Coach")
-        cls.stadium = baker.make("stadiums.Stadium")
+        cls.coach = [baker.make("coachs.Coach")]
+        cls.stadium = [baker.make("stadiums.Stadium")]
         cls.players = [baker.make("players.Player") for _ in range(5)]
+        # import ipdb
+        # ipdb.set_trace()
         cls.team_data = {
             "name": "Abacoteam",
             "mascot": "Abacate",
             "team_foundation_year": "1993-09-09",
-            "coach": cls.coach.id,
-            "stadium": cls.stadium.id,
+            "coach": cls.coach[0],
+            "stadium": cls.stadium[0],
             "players": cls.players,
         }
+        cls.team = Team.objects.create(**cls.team_data)
         cls.team_update_data = {"name": "Itaquaquecetuba", "mascot": "Capivara"}
         cls.normal_user_data = {
             "name": "guilhermina",
@@ -69,9 +72,7 @@ class TeamViewTests(APITestCase):
         expected_keys = {
             "name",
             "mascot",
-            "number_of_players",
             "team_foundation_year",
-            "players",
         }
 
         result_status = response.status_code
@@ -92,6 +93,9 @@ class TeamViewTests(APITestCase):
 
         login = self.client.post("/api/login/", login_data)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
+
+        # import ipdb
+        # ipdb.set_trace()
 
         response = self.client.post("/api/teams/", self.team_data)
 
@@ -212,8 +216,6 @@ class TeamViewTests(APITestCase):
     def test_update_team_with_superuser(self):
         """Usuário do tipo superuser deve ser capaz de atualizar os dados de um `team`"""
 
-        team = Team.objects.create(**self.team_data)
-
         login_data = {
             "email": self.superuser_data["email"],
             "password": self.superuser_data["password"],
@@ -221,6 +223,10 @@ class TeamViewTests(APITestCase):
 
         login = self.client.post("/api/login/", login_data)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
+
+        # import ipdb
+        # ipdb.set_trace()
+        team = Team.objects.create(**self.team_data)
 
         response = self.client.patch(f"/api/teams/{team.id}/", self.team_update_data)
 

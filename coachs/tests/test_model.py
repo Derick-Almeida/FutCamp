@@ -7,12 +7,12 @@ class CoachModelTest(TestCase):
     def setUpTestData(cls):
         cls.coach_data = {
             "name": "teste",
-            "birth_date": "2000-08-15",
-            "age": 22,
+            "birthdate": "2000-08-15",
+
             "biography": "ajkfasklfklas",
-            "number_of_titles": 5,
+
             "hometown": "recife",
-            "current_team": "barcelona",
+
         }
 
         cls.coach = Coach.objects.create(**cls.coach_data)
