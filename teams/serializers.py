@@ -1,9 +1,6 @@
 from rest_framework import serializers
-from django.shortcuts import get_object_or_404
 
 from .models import Team
-from titles.models import Title
-from players.models import Player
 from .utils import StadiumSerializer, CoachSerializer, PlayerSerializer, TitleSerializer
 from .services import create_team, update_team
 

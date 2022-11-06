@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from datetime import date
 
 from teams.models import Team
 from coachs.models import Coach
@@ -7,38 +6,24 @@ from players.models import Player
 
 
 class CoachSerializer(serializers.ModelSerializer):
-    age = serializers.SerializerMethodField()
+    number_of_titles = serializers.SerializerMethodField()
 
     class Meta:
         model = Coach
         fields = (
             "id",
             "name",
-            "birthdate",
-            "age",
-            "biography",
             "number_of_titles",
             "hometown",
         )
 
-    def get_age(self, obj: Coach) -> int:
-        current_date = date.today()
-        coach_birthdate = obj.birthdate
-
-        age = (
-            current_date.year
-            - coach_birthdate.year
-            - (
-                (current_date.month, current_date.day)
-                < (coach_birthdate.month, coach_birthdate.day)
-            )
-        )
-
-        return age
+    def get_number_of_titles(self, obj: Coach) -> int:
+        return obj.titles.all().count()
 
 
 class PlayerSerializer(serializers.ModelSerializer):
     number_of_goals = serializers.IntegerField(min_value=0)
+    number_of_titles = serializers.SerializerMethodField()
 
     class Meta:
         model = Player
@@ -46,18 +31,22 @@ class PlayerSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "name",
-            "birthdate",
             "hometown",
             "number_of_goals",
+            "number_of_titles",
             "position",
             "shirt_number",
         )
+
+    def get_number_of_titles(self, obj: Player) -> int:
+        return obj.titles.all().count()
 
 
 class TeamSerializer(serializers.ModelSerializer):
     coach = CoachSerializer(read_only=True)
     players = PlayerSerializer(many=True, read_only=True)
     number_of_players = serializers.SerializerMethodField()
+    number_of_titles = serializers.SerializerMethodField()
 
     class Meta:
         model = Team
@@ -67,6 +56,7 @@ class TeamSerializer(serializers.ModelSerializer):
             "name",
             "mascot",
             "number_of_players",
+            "number_of_titles",
             "team_foundation_year",
             "updated_at",
             "coach",
@@ -75,3 +65,6 @@ class TeamSerializer(serializers.ModelSerializer):
 
     def get_number_of_players(self, obj: Team) -> int:
         return obj.players.all().count()
+
+    def get_number_of_titles(self, obj: Team) -> int:
+        return obj.titles.all().count()

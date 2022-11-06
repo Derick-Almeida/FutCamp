@@ -100,23 +100,19 @@ def validate_team_fields(validated_data, serializer):
 
 
 def create_team(validated_data):
-    list_keys = validated_data.keys()
+    players = validated_data.pop("players", False)
+    titles = validated_data.pop("titles", False)
     player_list = []
     title_list = []
 
-    if "players" in list_keys:
-        players = validated_data.pop("players")
-
+    if bool(players):
         for player_id in players:
             player = get_object_or_404(Player, id=player_id)
             player_list.append(player)
 
-    if "titles" in list_keys:
-        titles = validated_data.pop("titles")
-
+    if bool(titles):
         for title_id in titles:
             title = get_object_or_404(Title, id=title_id)
-
             title_list.append(title)
 
     team = Team.objects.create(**validated_data)
@@ -127,23 +123,20 @@ def create_team(validated_data):
 
 
 def update_team(instance, validated_data):
-    list_keys = validated_data.keys()
+    players = validated_data.pop("players", False)
+    titles = validated_data.pop("titles", False)
     team = Team.objects.filter(id=instance.id).first()
 
-    if "players" in list_keys:
-        players = validated_data.pop("players")
+    if bool(players):
         team.players.clear()
 
         for player_id in players:
             player = get_object_or_404(Player, id=player_id)
             team.players.add(player)
 
-    if "titles" in list_keys:
-        titles = validated_data.pop("titles")
-
+    if bool(titles):
         for title_id in titles:
             title = get_object_or_404(Title, id=title_id)
-
             team.titles.add(title)
 
     for key, value in validated_data.items():

@@ -29,23 +29,23 @@ class User(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    # favorite_teams = models.ManyToManyField(
-    #     "teams.Team",
-    #     blank=True,
-    #     related_name="users",
-    # )
-    # favorite_players = models.ManyToManyField(
-    #     "players.Player",
-    #     blank=True,
-    #     related_name="users",
-    # )
-    # favorite_championships = models.ManyToManyField(
-    #     "championships.Championship",
-    #     blank=True,
-    #     related_name="users",
-    # )
+    favorite_teams = models.ManyToManyField(
+        "teams.Team",
+        blank=True,
+        related_name="users",
+    )
+    favorite_players = models.ManyToManyField(
+        "players.Player",
+        blank=True,
+        related_name="users",
+    )
+    favorite_championships = models.ManyToManyField(
+        "championships.Championship",
+        blank=True,
+        related_name="users",
+    )
 
     objects = UserManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ["name", "birthdate"]

@@ -9,8 +9,8 @@ from .models import Team
 
 
 class TeamView(SerializerByMethodMixin, generics.ListCreateAPIView):
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAdminOrReadOnly]
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAdminOrReadOnly]
 
     queryset = Team.objects.all()
     serializer_map = {
@@ -23,8 +23,8 @@ class TeamView(SerializerByMethodMixin, generics.ListCreateAPIView):
 
 
 class TeamDetailView(generics.RetrieveUpdateDestroyAPIView):
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAdminOrReadOnly]
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAdminOrReadOnly]
 
     serializer_class = TeamDetailSerializer
     queryset = Team.objects.all()

@@ -1,7 +1,9 @@
 from rest_framework import serializers
+from django.shortcuts import get_object_or_404
 from datetime import date
 
 from .models import Coach
+from teams.models import Team
 from .utils import TeamSerializer, TitleSerializer
 
 
@@ -25,8 +27,8 @@ class CoachSerializer(serializers.ModelSerializer):
 
 class CoachDetailSerializer(serializers.ModelSerializer):
     number_of_titles = serializers.SerializerMethodField()
-    current_team = TeamSerializer(default=None)
     age = serializers.SerializerMethodField()
+    current_team = TeamSerializer(read_only=True)
     titles = TitleSerializer(many=True, read_only=True)
 
     class Meta:
@@ -60,3 +62,28 @@ class CoachDetailSerializer(serializers.ModelSerializer):
 
     def get_number_of_titles(self, obj: Coach) -> int:
         return obj.titles.all().count()
+
+    def create(self, validated_data: dict) -> Coach:
+        team_id = validated_data.pop("current_team", False)
+
+        coach = Coach.objects.create(**validated_data)
+        if bool(team_id):
+            team = get_object_or_404(Team, id=team_id)
+            team.coach = coach
+            team.save()
+
+        return coach
+
+    def update(self, instance: Coach, validated_data: dict) -> Coach:
+        team_id = validated_data.pop("current_team", False)
+
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
+
+        if bool(team_id):
+            team = get_object_or_404(Team, id=team_id)
+            instance.current_team = team
+
+        instance.save()
+
+        return instance

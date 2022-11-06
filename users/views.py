@@ -1,15 +1,17 @@
 from rest_framework import generics
-from .models import User
-from .serializers import UserSerializer, UserDetailSerializer
-from .serializers import Loginserializer
 from rest_framework.views import APIView, Response, Request, status
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 
-# from users.utils import email_verificate
-
+from utils import IsAdmin, IsOwner
+from .serializers import (
+    UserSerializer,
+    UserDetailSerializer,
+    UserEnableDisableSerializer,
+)
+from .serializers import Loginserializer
 from .models import User
-from rest_framework.views import APIView, Response, status
-from rest_framework.authtoken.models import Token
 
 
 class UserCreateView(generics.CreateAPIView):
@@ -18,16 +20,16 @@ class UserCreateView(generics.CreateAPIView):
 
 
 class UserListView(generics.ListAPIView):
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = []
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAdmin]
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
 
 class UserDetailView(generics.RetrieveUpdateAPIView):
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = []
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAdmin | IsOwner]
 
     serializer_class = UserDetailSerializer
     queryset = User.objects.all()
@@ -36,10 +38,10 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
 
 
 class EnableDisableUserView(generics.UpdateAPIView):
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = []
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAdmin]
 
-    serializer_class = UserDetailSerializer
+    serializer_class = UserEnableDisableSerializer
     queryset = User.objects.all()
 
     lookup_url_kwarg = "user_id"
