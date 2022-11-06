@@ -48,16 +48,18 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     "rest_framework",
     "drf_spectacular",
+    "rest_framework.authtoken",
 ]
 
 MY_APPS = [
-    "users",
-    "games",
     "teams",
     "coachs",
     "players",
     "stadiums",
     "championships",
+    "titles",
+    "games",
+    "users.apps.UsersConfig",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + MY_APPS
@@ -167,8 +169,6 @@ STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
-
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

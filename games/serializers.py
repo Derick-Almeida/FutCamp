@@ -1,0 +1,63 @@
+from rest_framework import serializers
+from django.shortcuts import get_object_or_404
+
+from .models import Game
+from teams.models import Team
+from stadiums.models import Stadium
+from championships.models import Championship
+from .utils import StadiumSerializer, TeamSerializer, ChampionshipSerializer
+
+
+class GameSerializer(serializers.ModelSerializer):
+    stadium = StadiumSerializer(read_only=True)
+    teams = TeamSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Game
+        fields = (
+            "id",
+            "date",
+            "result",
+            "stadium",
+            "teams",
+        )
+
+
+class GameDetailSerializer(serializers.ModelSerializer):
+    stadium = StadiumSerializer(read_only=True)
+    teams = TeamSerializer(many=True, read_only=True)
+    championship = ChampionshipSerializer(read_only=True)
+
+    class Meta:
+        model = Game
+        fields = (
+            "id",
+            "date",
+            "result",
+            "championship",
+            "stadium",
+            "teams",
+        )
+
+    def create(self, validated_data):
+        stadium_id = validated_data.pop("stadium")
+        teams_id = validated_data.pop("teams")
+        championship_id = validated_data.pop("championship")
+        teams = []
+
+        for index, team_id in enumerate(teams_id):
+            if index < 2:
+                team = get_object_or_404(Team, id=team_id)
+                teams.append(team)
+
+        stadium = get_object_or_404(Stadium, id=stadium_id)
+        championship = get_object_or_404(Championship, id=championship_id)
+
+        game = Game.objects.create(
+            **validated_data,
+            stadium=stadium,
+            championship=championship,
+        )
+        game.teams.set(teams)
+
+        return game
