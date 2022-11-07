@@ -9,18 +9,15 @@ from teams.models import Team
 class TeamViewTests(APITestCase):
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.coach = [baker.make("coachs.Coach")]
-        cls.stadium = [baker.make("stadiums.Stadium")]
+        cls.coach = baker.make("coachs.Coach")
+        cls.stadium = baker.make("stadiums.Stadium")
         cls.players = [baker.make("players.Player") for _ in range(5)]
-        # import ipdb
-        # ipdb.set_trace()
         cls.team_data = {
             "name": "Abacoteam",
             "mascot": "Abacate",
             "team_foundation_year": "1993-09-09",
-            "coach": cls.coach[0],
-            "stadium": cls.stadium[0],
-            "players": cls.players,
+            "coach": cls.coach,
+            "stadium": cls.stadium,
         }
         cls.team = Team.objects.create(**cls.team_data)
         cls.team_update_data = {"name": "Itaquaquecetuba", "mascot": "Capivara"}
@@ -83,6 +80,30 @@ class TeamViewTests(APITestCase):
         self.assertEqual(expected_status, result_status, msg_status)
         self.assertSetEqual(expected_keys, result_keys)
 
+    def test_create_team_with_normal_user(self):
+        """Não deve ser capaz de criar um novo `team` com um usuário comum"""
+
+        login_data = {
+            "email": self.normal_user_data["email"],
+            "password": self.normal_user_data["password"],
+        }
+
+        login = self.client.post("/api/login/", login_data)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
+
+        response = self.client.post("/api/teams/", self.team_data)
+
+        expected_status = status.HTTP_403_FORBIDDEN
+        expected_key = {"detail"}
+
+        result_status = response.status_code
+        result_key = set(response.data.keys())
+
+        msg_status = "O status code recebido esta diferente do esperado"
+
+        self.assertEqual(expected_status, result_status, msg_status)
+        self.assertSetEqual(expected_key, result_key)
+
     def test_create_team_with_superuser(self):
         """Deve ser capaz de criar um novo `team` com um superusuario"""
 
@@ -90,14 +111,16 @@ class TeamViewTests(APITestCase):
             "email": self.superuser_data["email"],
             "password": self.superuser_data["password"],
         }
+        team_data = {
+            "name": "Abacoteam o retorno",
+            "mascot": "Abacatron",
+            "team_foundation_year": "1996-09-09",
+        }
 
         login = self.client.post("/api/login/", login_data)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
 
-        # import ipdb
-        # ipdb.set_trace()
-
-        response = self.client.post("/api/teams/", self.team_data)
+        response = self.client.post("/api/teams/", team_data)
 
         expected_status = status.HTTP_201_CREATED
 
@@ -127,7 +150,7 @@ class TeamViewTests(APITestCase):
         expected_length = 1
 
         result_status = response.status_code
-        result_keys = {set(response.data.keys())}
+        result_keys = set(response.data.keys())
         result_length = len(response.data["results"])
 
         msg_status = "O status code recebido esta diferente do esperado"
@@ -154,7 +177,7 @@ class TeamViewTests(APITestCase):
         expected_length = 1
 
         result_status = response.status_code
-        result_keys = {set(response.data.keys())}
+        result_keys = set(response.data.keys())
         result_length = len(response.data["results"])
 
         msg_status = "O status code recebido esta diferente do esperado"
@@ -166,8 +189,6 @@ class TeamViewTests(APITestCase):
     def test_retrieve_team_with_superuser(self):
         """Usuário do tipo superuser deve ser capaz buscar um `team` por id"""
 
-        team = Team.objects.create(**self.team_data)
-
         login_data = {
             "email": self.superuser_data["email"],
             "password": self.superuser_data["password"],
@@ -176,12 +197,12 @@ class TeamViewTests(APITestCase):
         login = self.client.post("/api/login/", login_data)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
 
-        response = self.client.get(f"/api/teams/{team.id}/")
+        response = self.client.get(f"/api/teams/{self.team.id}/")
 
         expected_status = status.HTTP_200_OK
 
         result_status = response.status_code
-        result_keys = {set(response.data.keys())}
+        result_keys = set(response.data.keys())
 
         msg_status = "O status code recebido esta diferente do esperado"
 
@@ -191,8 +212,6 @@ class TeamViewTests(APITestCase):
     def test_retrieve_team_with_normal_user(self):
         """Usuário normal deve ser capaz buscar um `team` por id"""
 
-        team = Team.objects.create(**self.team_data)
-
         login_data = {
             "email": self.normal_user_data["email"],
             "password": self.normal_user_data["password"],
@@ -201,12 +220,12 @@ class TeamViewTests(APITestCase):
         login = self.client.post("/api/login/", login_data)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
 
-        response = self.client.get(f"/api/teams/{team.id}/")
+        response = self.client.get(f"/api/teams/{self.team.id}/")
 
         expected_status = status.HTTP_200_OK
 
         result_status = response.status_code
-        result_keys = {set(response.data.keys())}
+        result_keys = set(response.data.keys())
 
         msg_status = "O status code recebido esta diferente do esperado"
 
@@ -224,16 +243,14 @@ class TeamViewTests(APITestCase):
         login = self.client.post("/api/login/", login_data)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
 
-        # import ipdb
-        # ipdb.set_trace()
-        team = Team.objects.create(**self.team_data)
-
-        response = self.client.patch(f"/api/teams/{team.id}/", self.team_update_data)
+        response = self.client.patch(
+            f"/api/teams/{self.team.id}/", self.team_update_data
+        )
 
         expected_status = status.HTTP_200_OK
 
         result_status = response.status_code
-        result_keys = {set(response.data.keys())}
+        result_keys = set(response.data.keys())
 
         msg_status = "O status code recebido esta diferente do esperado"
 
@@ -243,8 +260,6 @@ class TeamViewTests(APITestCase):
     def test_update_team_with_normal_user(self):
         """Usuário normal não deve ser capaz de atualizar os dados de um `team`"""
 
-        team = Team.objects.create(**self.team_data)
-
         login_data = {
             "email": self.normal_user_data["email"],
             "password": self.normal_user_data["password"],
@@ -253,13 +268,15 @@ class TeamViewTests(APITestCase):
         login = self.client.post("/api/login/", login_data)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
 
-        response = self.client.patch(f"/api/teams/{team.id}/", self.team_update_data)
+        response = self.client.patch(
+            f"/api/teams/{self.team.id}/", self.team_update_data
+        )
 
         expected_status = status.HTTP_403_FORBIDDEN
         expected_keys = {"detail"}
 
         result_status = response.status_code
-        result_keys = {set(response.data.keys())}
+        result_keys = set(response.data.keys())
 
         msg_status = "O status code recebido esta diferente do esperado"
 
@@ -269,8 +286,6 @@ class TeamViewTests(APITestCase):
     def test_delete_team_with_superuser(self):
         """Usuário do tipo superuser deve ser capaz de deletar um `team`"""
 
-        team = Team.objects.create(**self.team_data)
-
         login_data = {
             "email": self.superuser_data["email"],
             "password": self.superuser_data["password"],
@@ -279,7 +294,7 @@ class TeamViewTests(APITestCase):
         login = self.client.post("/api/login/", login_data)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
 
-        response = self.client.delete(f"/api/teams/{team.id}/")
+        response = self.client.delete(f"/api/teams/{self.team.id}/")
 
         expected_status = status.HTTP_204_NO_CONTENT
         result_status = response.status_code
@@ -290,8 +305,6 @@ class TeamViewTests(APITestCase):
     def test_delete_team_with_normal_user(self):
         """Usuário normal não deve ser capaz de deletar um `team`"""
 
-        team = Team.objects.create(**self.team_data)
-
         login_data = {
             "email": self.normal_user_data["email"],
             "password": self.normal_user_data["password"],
@@ -300,13 +313,13 @@ class TeamViewTests(APITestCase):
         login = self.client.post("/api/login/", login_data)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
 
-        response = self.client.delete(f"/api/teams/{team.id}/")
+        response = self.client.delete(f"/api/teams/{self.team.id}/")
 
         expected_status = status.HTTP_403_FORBIDDEN
         expected_keys = {"detail"}
 
         result_status = response.status_code
-        result_keys = {set(response.data.keys())}
+        result_keys = set(response.data.keys())
 
         msg_status = "O status code recebido esta diferente do esperado"
 
