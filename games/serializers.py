@@ -51,18 +51,19 @@ class GameDetailSerializer(serializers.ModelSerializer):
         return f"{obj.teams.all()[0].name} (home) {obj.result} (away) {obj.teams.all()[1].name}"
 
     def create(self, validated_data):
-        stadium_id = validated_data.pop("stadium")
-        teams_id = validated_data.pop("teams")
         championship_id = validated_data.pop("championship")
+        stadium_id = validated_data.pop("stadium")
+        teams_id = validated_data.pop("teams", False)
         teams = []
 
-        for index, team_id in enumerate(teams_id):
-            if index < 2:
-                team = get_object_or_404(Team, id=team_id)
-                teams.append(team)
-
-        stadium = get_object_or_404(Stadium, id=stadium_id)
         championship = get_object_or_404(Championship, id=championship_id)
+        stadium = get_object_or_404(Stadium, id=stadium_id)
+
+        if bool(team_id):
+            for index, team_id in enumerate(teams_id):
+                if index < 2:
+                    team = get_object_or_404(Team, id=team_id)
+                    teams.append(team)
 
         game = Game.objects.create(
             **validated_data,
