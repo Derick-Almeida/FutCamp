@@ -11,7 +11,7 @@ from django_filters import rest_framework as filters
 class GameFilter(filters.FilterSet):
     championship = filters.CharFilter(field_name="championship", lookup_expr="exact")
     date = filters.CharFilter(field_name="date", lookup_expr="exact")
-    round = filters.NumberFilter(field_name="round", lookup_expr="exact")
+    round = filters.CharFilter(field_name="round", lookup_expr="icontains")
     stadium = filters.CharFilter(field_name="stadium", lookup_expr="exact")
 
     class Meta:

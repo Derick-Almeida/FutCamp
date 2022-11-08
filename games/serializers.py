@@ -9,9 +9,6 @@ from .utils import StadiumSerializer, TeamSerializer, ChampionshipSerializer
 
 
 class GameSerializer(serializers.ModelSerializer):
-    # stadium = StadiumSerializer(read_only=True)
-    # teams = TeamSerializer(many=True, read_only=True)
-
     class Meta:
         model = Game
         fields = (
@@ -28,8 +25,6 @@ class GameSerializer(serializers.ModelSerializer):
             "teams",
             "championship",
         ]
-
-        depth = 0
 
 
 class GameDetailSerializer(serializers.ModelSerializer):
