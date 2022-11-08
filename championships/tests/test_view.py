@@ -41,11 +41,6 @@ class ChampionshipsViewsTest(APITestCase):
             "email": self.superuser_data["email"],
             "password": self.superuser_data["password"],
         }
-        team = Team.objects.create(
-            name="jorge",
-            mascot="picles",
-            team_foundation_year="1996-09-09",
-        )
         championship_data = {
             "name": "garcia chalanger plus ultra jorge",
             "description": "Torneio do garcia",
