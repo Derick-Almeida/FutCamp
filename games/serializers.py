@@ -59,7 +59,7 @@ class GameDetailSerializer(serializers.ModelSerializer):
         championship = get_object_or_404(Championship, id=championship_id)
         stadium = get_object_or_404(Stadium, id=stadium_id)
 
-        if bool(team_id):
+        if bool(teams_id):
             for index, team_id in enumerate(teams_id):
                 if index < 2:
                     team = get_object_or_404(Team, id=team_id)
