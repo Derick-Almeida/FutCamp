@@ -31,7 +31,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["futcamp-api.herokuapp.com", "localhost"]
 
 
 # Application definition
@@ -49,6 +49,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "drf_spectacular",
     "rest_framework.authtoken",
+    "django_filters",
 ]
 
 MY_APPS = [
@@ -99,36 +100,36 @@ WSGI_APPLICATION = "_futcamp.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-# if os.environ.get("TEST"):
-DATABASES = {
+if os.environ.get("TEST"):
+    DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
-# elif os.environ.get("GITHUB_WORKFLOW"):
-#     DATABASES = {
-#         "default": {
-#             "ENGINE": "django.db.backends.postgresql",
-#             "NAME": "github-actions",
-#             "USER": "postgres",
-#             "PASSWORD": "postgres",
-#             "HOST": "localhost",
-#             "PORT": "5432",
-#         }
-#     }
-#     SECRET_KEY = "pepino"
-# else:
-#     DATABASES = {
-#         "default": {
-#             "ENGINE": "django.db.backends.postgresql",
-#             "NAME": os.environ.get("POSTGRES_DB"),
-#             "USER": os.environ.get("POSTGRES_USER"),
-#             "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
-#             "HOST": "127.0.0.1",
-#             "PORT": "5432",
-#         }
-#     }
+elif os.environ.get("GITHUB_WORKFLOW"):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": "github-actions",
+            "USER": "postgres",
+            "PASSWORD": "postgres",
+            "HOST": "localhost",
+            "PORT": "5432",
+        }
+    }
+    SECRET_KEY = "pepino"
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.environ.get("POSTGRES_DB"),
+            "USER": os.environ.get("POSTGRES_USER"),
+            "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
+            "HOST": "127.0.0.1",
+            "PORT": "5432",
+        }
+    }
 
 
 # Password validation
@@ -175,6 +176,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "users.User"
 
 REST_FRAMEWORK = {
+    "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,

@@ -36,9 +36,9 @@ class TeamModelTest(TestCase):
         self.assertEqual(expected, result, msg)
 
     def test_team_contain_unique_coach(self):
-        """Verificando se o `team` possui apenas um `group`"""
+        """Verificando se o `team` possui apenas um `coach`"""
 
-        msg = "Verifique se os valores do campo `group` estão corretos"
+        msg = "Verifique se os valores do campo `coach` estão corretos"
 
         self.assertIs(self.coach, self.team.coach, msg)
 
