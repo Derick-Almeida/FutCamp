@@ -9,8 +9,8 @@ from .utils import StadiumSerializer, TeamSerializer, ChampionshipSerializer
 
 
 class GameSerializer(serializers.ModelSerializer):
-    stadium = StadiumSerializer(read_only=True)
-    teams = TeamSerializer(many=True, read_only=True)
+    # stadium = StadiumSerializer(read_only=True)
+    # teams = TeamSerializer(many=True, read_only=True)
 
     class Meta:
         model = Game
@@ -18,15 +18,25 @@ class GameSerializer(serializers.ModelSerializer):
             "id",
             "date",
             "result",
+            "round",
             "stadium",
             "teams",
+            "championship",
         )
+        read_only_fields = [
+            "stadium",
+            "teams",
+            "championship",
+        ]
+
+        depth = 0
 
 
 class GameDetailSerializer(serializers.ModelSerializer):
     stadium = StadiumSerializer(read_only=True)
     teams = TeamSerializer(many=True, read_only=True)
     championship = ChampionshipSerializer(read_only=True)
+    match_result = serializers.SerializerMethodField()
 
     class Meta:
         model = Game
@@ -34,10 +44,16 @@ class GameDetailSerializer(serializers.ModelSerializer):
             "id",
             "date",
             "result",
+            "match_result",
+            "round",
             "championship",
             "stadium",
             "teams",
         )
+        extra_kwargs = {"result": {"write_only": True}}
+
+    def get_match_result(self, obj: Game):
+        return f"{obj.teams.all()[0].name} (home) {obj.result} (away) {obj.teams.all()[1].name}"
 
     def create(self, validated_data):
         stadium_id = validated_data.pop("stadium")

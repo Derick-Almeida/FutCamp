@@ -6,6 +6,8 @@ class Game(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     date = models.DateTimeField()
     result = models.CharField(max_length=150)
+    # Nulo por enquanto
+    round = models.PositiveIntegerField(null=True, blank=True, default=None)
 
     stadium = models.ForeignKey(
         "stadiums.Stadium",
