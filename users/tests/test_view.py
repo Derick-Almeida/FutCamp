@@ -9,66 +9,26 @@ from championships.models import Championship
 class UserViewerTest(APITestCase):
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.register_url = "/api/users/register/"
-        cls.team_cadastro = {}
-        cls.players_cadastro = {}
-        cls.championship_cadastro = {}
-        cls.team_test = Team.objects.create(**cls.team_cadastro)
-        cls.player_test = Player.objects.create(**cls.players_cadastro)
-        cls.championship_test = Championship.objects.create(**cls.championship_cadastro)
-
-        cls.user_cadastro_correto = {
+        cls.user_data = {
             "name": "Xuxa Meneguel",
             "email": "xuxa@mail.com",
             "password": "ilarilarie",
-            "birth_date": "1964-10-10",
-            "genre": "Não Informado",
-            "favorite_teams": cls.team_test,
-            "favorite_players": cls.player_test,
-            "favorite_championships": cls.championship_test,
+            "birthdate": "1964-10-10",
         }
-
-        cls.user_cadastro_errado = {
-            "name": "Xuxa Meneguel",
-            "email": "xuxa@mail.com",
-            "birth_date": "1964-10-10",
-            "genre": "Não Informado",
-            "favorite_teams": cls.team_test,
-            "favorite_players": cls.player_test,
-            "favorite_championships": cls.championship_test,
+        cls.superuser_data = {
+            "name": "Adamastor",
+            "email": "adamastor@mail.com",
+            "password": "123456",
+            "birthdate": "1999-09-09",
+            "genre": "Masculino",
         }
+        cls.superuser = User.objects.create_superuser(**cls.superuser_data)
 
-    def test_can_register_new_user(self):
-        response = self.client.post(self.register_url, self.user_cadastro_correto)
-
-        user_count = User.objects.count()
-
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.data["name"], self.user_cadastro_correto["name"])
-        self.assertEqual(response.data["email"], self.user_cadastro_correto["email"])
-        self.assertEqual(1, user_count)
-
-    def test_cannot_register_new_user(self):
-        response = self.client.post(self.register_url, self.user_cadastro_errado)
-
-        self.assertEqual(response.status_code, 400)
-
-    def test_password_is_hashed(self):
-        response = self.client.post(self.register_url, self.user_cadastro_correto)
-        user = User.objects.first()
-
-        is_password_true = user.check_password(self.user_cadastro_correto["password"])
-
-        self.assertTrue(is_password_true)
-
-    def test_returning_keys(self):
-        response = self.client.post(self.register_url, self.user_cadastro_correto)
-
-        user_keys = {
+        cls.expected_keys = {
             "id",
             "name",
             "email",
-            "birth_date",
+            "birthdate",
             "is_superuser",
             "is_active",
             "genre",
@@ -79,6 +39,86 @@ class UserViewerTest(APITestCase):
             "favorite_championships",
         }
 
-        response_keys = set(response.data.keys())
+    def test_can_register_new_user(self):
+        response = self.client.post("/api/register/", self.user_data)
 
-        self.assertSetEqual(user_keys, response_keys)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(self.expected_keys, set(response.data.keys()))
+
+    def test_cannot_register_new_user(self):
+        response = self.client.post("/api/register/", {})
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_login(self):
+        login_data = {
+            "email": self.superuser_data["email"],
+            "password": self.superuser_data["password"],
+        }
+        response = self.client.post("/api/login/", login_data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual({"token"}, set(response.data.keys()))
+
+    def test_list_users(self):
+        login_data = {
+            "email": self.superuser_data["email"],
+            "password": self.superuser_data["password"],
+        }
+
+        login = self.client.post("/api/login/", login_data)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
+
+        response = self.client.get("/api/users/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(1, response.data["count"])
+
+    def test_retrieve_user(self):
+        login_data = {
+            "email": self.superuser_data["email"],
+            "password": self.superuser_data["password"],
+        }
+        user = User.objects.create_user(**self.user_data)
+
+        login = self.client.post("/api/login/", login_data)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
+
+        response = self.client.get(f"/api/users/{user.id}/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.expected_keys, set(response.data.keys()))
+
+    def test_update_user(self):
+        login_data = {
+            "email": self.superuser_data["email"],
+            "password": self.superuser_data["password"],
+        }
+        user = User.objects.create_user(**self.user_data)
+
+        login = self.client.post("/api/login/", login_data)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
+
+        response = self.client.patch(f"/api/users/{user.id}/", {"name": "jorge"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.expected_keys, set(response.data.keys()))
+        self.assertEqual("jorge", response.data["name"])
+
+    def test_disable_user(self):
+        login_data = {
+            "email": self.superuser_data["email"],
+            "password": self.superuser_data["password"],
+        }
+        user = User.objects.create_user(**self.user_data)
+
+        login = self.client.post("/api/login/", login_data)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
+
+        response = self.client.patch(
+            f"/api/users/{user.id}/enable_disable/", {"is_active": False}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.expected_keys, set(response.data.keys()))
+        self.assertFalse(response.data["is_active"])
