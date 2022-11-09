@@ -1,18 +1,14 @@
-import ipdb
 from rest_framework import generics
 from rest_framework.views import APIView, Response, Request, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
-from django.shortcuts import get_object_or_404, get_list_or_404
 
 from utils import IsAdmin, IsOwner
 from .serializers import (
     UserSerializer,
     UserDetailSerializer,
     UserEnableDisableSerializer,
-    UserFavoriteSerializer,
-    UserFavoriteDetailSerializer,
 )
 from .serializers import Loginserializer
 from .models import User
@@ -39,47 +35,6 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
 
     lookup_url_kwarg = "user_id"
-
-
-class UserFavoriteView(generics.ListAPIView):
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAdmin | IsOwner]
-
-    serializer_class = UserFavoriteSerializer
-    queryset = User.objects.all()
-
-    lookup_url_kwarg = "user_id"
-
-
-class UserFavoriteDetailView(generics.RetrieveUpdateDestroyAPIView):
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAdmin | IsOwner]
-    serializer_class = UserFavoriteDetailSerializer
-    queryset = User.objects.all()
-
-    lookup_url_kwarg = ["user_id", "favorite_id"]
-
-    def perform_update(self, serializer):
-        print("=" * 100)
-        print("foi")
-        ipdb.set_trace()
-        print()
-        # key = []
-        # keys = self.request.data.keys()
-        # if "favorite_teams" in keys:
-        #     key.append({"favorite_teams": self.request.data["favorite_teams"]})
-        # if "favorite_players" in keys:
-        #     key.append({"favorite_players": self.request.data["favorite_players"]})
-        # if "favorite_championships" in keys:
-        #     key.append(
-        #         {"favorite_championships": self.request.data["favorite_championships"]}
-        #     )
-
-        # serializer.save()
-    def get_queryset(self):
-        if self.request.method == "GET":
-            return get_object_or_404(User, favorite_teams=self.kwargs["favorite_id"])
-        return self.queryset.all()
 
 
 class EnableDisableUserView(generics.UpdateAPIView):
