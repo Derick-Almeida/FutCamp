@@ -17,7 +17,12 @@ class ChampionshipView(SerializerByMethodMixin, generics.ListCreateAPIView):
     }
 
     def perform_create(self, serializer):
-        serializer.save(teams=self.request.data["teams"])
+        list_keys = self.request.data.keys()
+
+        if "teams" in list_keys:
+            serializer.save(teams=self.request.data["teams"])
+
+        serializer.save()
 
 
 class ChampionshipDetailView(generics.RetrieveUpdateDestroyAPIView):
