@@ -8,5 +8,10 @@ urlpatterns = [
     path("register/", views.UserCreateView.as_view()),
     path("users/", views.UserListView.as_view()),
     path("users/<str:user_id>/", views.UserDetailView.as_view()),
+    path("users/<str:user_id>/favorites/", views.UserFavoriteView.as_view()),
+    path(
+        "users/<str:user_id>/favorites/<str:favorite_id>/",
+        views.UserFavoriteDetailView.as_view(),
+    ),
     path("users/<str:user_id>/enable_disable/", views.EnableDisableUserView.as_view()),
 ]
