@@ -4,23 +4,24 @@ from rest_framework.views import status
 from model_bakery import baker
 from users.models import User
 from teams.models import Team
+from titles.models import Title
 
 
 class TeamViewTests(APITestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         cls.coach = baker.make("coachs.Coach")
-        cls.stadium = baker.make("stadiums.Stadium")
         cls.players = [baker.make("players.Player") for _ in range(5)]
         cls.team_data = {
             "name": "Abacoteam",
             "mascot": "Abacate",
             "team_foundation_year": "1993-09-09",
             "coach": cls.coach,
-            "stadium": cls.stadium,
         }
         cls.team = Team.objects.create(**cls.team_data)
-        cls.team_update_data = {"name": "Itaquaquecetuba", "mascot": "Capivara"}
+        cls.title = Title.objects.create(
+            name="titulo", year_of_conquest="2002-02-02", team=cls.team
+        )
         cls.normal_user_data = {
             "name": "guilhermina",
             "email": "guilhermina@mail.com",
@@ -41,19 +42,14 @@ class TeamViewTests(APITestCase):
         cls.expected_keys = {
             "id",
             "name",
-            "mascot",
-            "number_of_players",
-            "number_of_titles",
-            "team_foundation_year",
-            "updated_at",
-            "titles",
-            "players",
+            "year_of_conquest",
+            "team",
             "coach",
-            "stadium",
+            "players",
         }
 
-    def test_create_team_empty_body(self):
-        """Não deve ser capaz de criar um novo `team` caso o corpo da requisição esteja vazio"""
+    def test_create_title_empty_body(self):
+        """Não deve ser capaz de criar um novo `title` caso o corpo da requisição esteja vazio"""
 
         login_data = {
             "email": self.superuser_data["email"],
@@ -63,13 +59,12 @@ class TeamViewTests(APITestCase):
         login = self.client.post("/api/login/", login_data)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
 
-        response = self.client.post("/api/teams/", {})
+        response = self.client.post("/api/titles/", {})
 
         expected_status = status.HTTP_400_BAD_REQUEST
         expected_keys = {
             "name",
-            "mascot",
-            "team_foundation_year",
+            "year_of_conquest",
         }
 
         result_status = response.status_code
@@ -80,18 +75,23 @@ class TeamViewTests(APITestCase):
         self.assertEqual(expected_status, result_status, msg_status)
         self.assertSetEqual(expected_keys, result_keys)
 
-    def test_create_team_with_normal_user(self):
-        """Não deve ser capaz de criar um novo `team` com um usuário comum"""
+    def test_create_title_with_normal_user(self):
+        """Não deve ser capaz de criar um novo `title` com um usuário comum"""
 
         login_data = {
             "email": self.normal_user_data["email"],
             "password": self.normal_user_data["password"],
         }
+        title_data = {
+            "name": "titulo",
+            "year_of_conquest": "2002-02-02",
+            "team": self.team.id,
+        }
 
         login = self.client.post("/api/login/", login_data)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
 
-        response = self.client.post("/api/teams/", self.team_data)
+        response = self.client.post("/api/titles/", title_data)
 
         expected_status = status.HTTP_403_FORBIDDEN
         expected_key = {"detail"}
@@ -104,23 +104,24 @@ class TeamViewTests(APITestCase):
         self.assertEqual(expected_status, result_status, msg_status)
         self.assertSetEqual(expected_key, result_key)
 
-    def test_create_team_with_superuser(self):
-        """Deve ser capaz de criar um novo `team` com um superusuario"""
+    def test_create_title_with_superuser(self):
+        """Deve ser capaz de criar um novo `title` com um superusuario"""
 
         login_data = {
             "email": self.superuser_data["email"],
             "password": self.superuser_data["password"],
         }
-        team_data = {
-            "name": "Abacoteam o retorno",
-            "mascot": "Abacatron",
-            "team_foundation_year": "1996-09-09",
-        }
 
         login = self.client.post("/api/login/", login_data)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
 
-        response = self.client.post("/api/teams/", team_data)
+        title_data = {
+            "name": "Titulo 4",
+            "year_of_conquest": "2022-11-04",
+            "team": str(self.team.id),
+        }
+
+        response = self.client.post("/api/titles/", title_data)
 
         expected_status = status.HTTP_201_CREATED
 
@@ -132,8 +133,8 @@ class TeamViewTests(APITestCase):
         self.assertEqual(expected_status, result_status, msg_status)
         self.assertSetEqual(self.expected_keys, result_keys)
 
-    def test_list_teams_with_superuser(self):
-        """Usuário do tipo superuser deve ser capaz de listar todos os times"""
+    def test_list_tirle_with_superuser(self):
+        """Usuário do tipo superuser deve ser capaz de listar todos os ttitulos"""
 
         login_data = {
             "email": self.superuser_data["email"],
@@ -143,7 +144,7 @@ class TeamViewTests(APITestCase):
         login = self.client.post("/api/login/", login_data)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
 
-        response = self.client.get("/api/teams/")
+        response = self.client.get("/api/titles/")
 
         expected_status = status.HTTP_200_OK
         expected_keys = {"count", "next", "previous", "results"}
@@ -159,8 +160,8 @@ class TeamViewTests(APITestCase):
         self.assertSetEqual(expected_keys, result_keys)
         self.assertEqual(expected_length, result_length)
 
-    def test_list_teams_with_normal_user(self):
-        """Usuário normal deve ser capaz de listr todos os times"""
+    def test_list_titles_with_normal_user(self):
+        """Usuário normal deve ser capaz de listr todos os titulos"""
 
         login_data = {
             "email": self.normal_user_data["email"],
@@ -170,7 +171,7 @@ class TeamViewTests(APITestCase):
         login = self.client.post("/api/login/", login_data)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
 
-        response = self.client.get("/api/teams/")
+        response = self.client.get("/api/titles/")
 
         expected_status = status.HTTP_200_OK
         expected_keys = {"count", "next", "previous", "results"}
@@ -186,8 +187,8 @@ class TeamViewTests(APITestCase):
         self.assertSetEqual(expected_keys, result_keys)
         self.assertEqual(expected_length, result_length)
 
-    def test_retrieve_team_with_superuser(self):
-        """Usuário do tipo superuser deve ser capaz buscar um `team` por id"""
+    def test_retrieve_title_with_superuser(self):
+        """Usuário do tipo superuser deve ser capaz buscar um `title` por id"""
 
         login_data = {
             "email": self.superuser_data["email"],
@@ -197,7 +198,7 @@ class TeamViewTests(APITestCase):
         login = self.client.post("/api/login/", login_data)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
 
-        response = self.client.get(f"/api/teams/{self.team.id}/")
+        response = self.client.get(f"/api/titles/{self.title.id}/")
 
         expected_status = status.HTTP_200_OK
 
@@ -209,8 +210,8 @@ class TeamViewTests(APITestCase):
         self.assertEqual(expected_status, result_status, msg_status)
         self.assertSetEqual(self.expected_keys, result_keys)
 
-    def test_retrieve_team_with_normal_user(self):
-        """Usuário normal deve ser capaz buscar um `team` por id"""
+    def test_retrieve_title_with_normal_user(self):
+        """Usuário normal deve ser capaz buscar um `title` por id"""
 
         login_data = {
             "email": self.normal_user_data["email"],
@@ -220,7 +221,7 @@ class TeamViewTests(APITestCase):
         login = self.client.post("/api/login/", login_data)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
 
-        response = self.client.get(f"/api/teams/{self.team.id}/")
+        response = self.client.get(f"/api/titles/{self.title.id}/")
 
         expected_status = status.HTTP_200_OK
 
@@ -232,8 +233,8 @@ class TeamViewTests(APITestCase):
         self.assertEqual(expected_status, result_status, msg_status)
         self.assertSetEqual(self.expected_keys, result_keys)
 
-    def test_update_team_with_superuser(self):
-        """Usuário do tipo superuser deve ser capaz de atualizar os dados de um `team`"""
+    def test_update_title_with_superuser(self):
+        """Usuário do tipo superuser deve ser capaz de atualizar os dados de um `title`"""
 
         login_data = {
             "email": self.superuser_data["email"],
@@ -244,7 +245,7 @@ class TeamViewTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
 
         response = self.client.patch(
-            f"/api/teams/{self.team.id}/", self.team_update_data
+            f"/api/titles/{self.title.id}/", {"name": "titulo 2"}
         )
 
         expected_status = status.HTTP_200_OK
@@ -257,8 +258,8 @@ class TeamViewTests(APITestCase):
         self.assertEqual(expected_status, result_status, msg_status)
         self.assertSetEqual(self.expected_keys, result_keys)
 
-    def test_update_team_with_normal_user(self):
-        """Usuário normal não deve ser capaz de atualizar os dados de um `team`"""
+    def test_update_title_with_normal_user(self):
+        """Usuário normal não deve ser capaz de atualizar os dados de um `title`"""
 
         login_data = {
             "email": self.normal_user_data["email"],
@@ -269,7 +270,7 @@ class TeamViewTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
 
         response = self.client.patch(
-            f"/api/teams/{self.team.id}/", self.team_update_data
+            f"/api/titles/{self.title.id}/", {"name": "titulo 2"}
         )
 
         expected_status = status.HTTP_403_FORBIDDEN
@@ -283,8 +284,8 @@ class TeamViewTests(APITestCase):
         self.assertEqual(expected_status, result_status, msg_status)
         self.assertSetEqual(expected_keys, result_keys)
 
-    def test_delete_team_with_superuser(self):
-        """Usuário do tipo superuser deve ser capaz de deletar um `team`"""
+    def test_delete_title_with_superuser(self):
+        """Usuário do tipo superuser deve ser capaz de deletar um `title`"""
 
         login_data = {
             "email": self.superuser_data["email"],
@@ -294,7 +295,7 @@ class TeamViewTests(APITestCase):
         login = self.client.post("/api/login/", login_data)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
 
-        response = self.client.delete(f"/api/teams/{self.team.id}/")
+        response = self.client.delete(f"/api/titles/{self.title.id}/")
 
         expected_status = status.HTTP_204_NO_CONTENT
         result_status = response.status_code
@@ -302,8 +303,8 @@ class TeamViewTests(APITestCase):
 
         self.assertEqual(expected_status, result_status, msg_status)
 
-    def test_delete_team_with_normal_user(self):
-        """Usuário normal não deve ser capaz de deletar um `team`"""
+    def test_delete_title_with_normal_user(self):
+        """Usuário normal não deve ser capaz de deletar um `title`"""
 
         login_data = {
             "email": self.normal_user_data["email"],
@@ -313,7 +314,7 @@ class TeamViewTests(APITestCase):
         login = self.client.post("/api/login/", login_data)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + login.data["token"])
 
-        response = self.client.delete(f"/api/teams/{self.team.id}/")
+        response = self.client.delete(f"/api/titles/{self.title.id}/")
 
         expected_status = status.HTTP_403_FORBIDDEN
         expected_keys = {"detail"}

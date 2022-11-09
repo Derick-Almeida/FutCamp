@@ -27,17 +27,35 @@ class TitleDetailSerializer(serializers.ModelSerializer):
             "players",
         )
 
+        read_only_fields = ["coach", "players"]
+
     def create(self, validated_data: dict) -> Title:
-        team_id = validated_data.pop("team")
-        team = get_object_or_404(Team, id=team_id)
-        title = Title.objects.create(**validated_data)
+        team_id = validated_data.pop("team", False)
 
-        team.titles.add(title)
-        team.coach.titles.add(title)
+        title = Title.objects.create(**validated_data, team=None)
 
-        for player in team.players.all():
-            player.titles.add(title)
+        if bool(team_id):
+            team = get_object_or_404(Team, id=team_id)
 
-        team.save()
+            players = []
+            team.titles.add(title)
+            if bool(team.coach):
+                team.coach.titles.add(title)
+
+            for player in team.players.all():
+                players.append(player)
+
+            title.players.set(players)
+            team.save()
 
         return title
+
+    def update(self, instance: Title, validated_data: dict) -> Title:
+        validated_data.pop("team", False)
+
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
+
+        instance.save()
+
+        return instance

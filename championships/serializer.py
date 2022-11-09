@@ -39,15 +39,14 @@ class ChampionshipDetailSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data: dict) -> Championship:
-        team_list = validated_data.pop("teams")
-        teams = []
-
-        for team_id in team_list:
-            team = get_object_or_404(Team, id=team_id)
-            teams.append(team)
+        team_list = validated_data.pop("teams", False)
 
         championship = Championship.objects.create(**validated_data)
-        championship.teams.set(teams)
+
+        if bool(team_list):
+            for team_id in team_list:
+                team = get_object_or_404(Team, id=team_id)
+                championship.teams.add(team)
 
         return championship
 
