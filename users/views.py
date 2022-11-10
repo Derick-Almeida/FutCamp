@@ -61,3 +61,14 @@ class loginView(APIView):
         token, _ = Token.objects.get_or_create(user=user)
 
         return Response({"token": token.key})
+
+
+class updateView(generics.UpdateAPIView):
+
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAdmin]
+
+    serializer_class = UserEnableDisableSerializer
+    queryset = User.objects.all()
+
+    lookup_url_kwarg = "user_id"
