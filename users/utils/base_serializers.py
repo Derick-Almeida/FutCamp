@@ -61,9 +61,6 @@ class CoachSerializer(serializers.ModelSerializer):
 
 
 class TeamSerializer(serializers.ModelSerializer):
-    stadium = StadiumSerializer(read_only=True)
-    coach = CoachSerializer(read_only=True)
-    players = PlayerSerializer(many=True, read_only=True)
     number_of_players = serializers.SerializerMethodField()
     number_of_titles = serializers.SerializerMethodField()
 
@@ -80,7 +77,6 @@ class TeamSerializer(serializers.ModelSerializer):
             "updated_at",
             "stadium",
             "coach",
-            "players",
         )
 
     def get_number_of_players(self, obj: Team) -> int:
@@ -92,7 +88,7 @@ class TeamSerializer(serializers.ModelSerializer):
 
 class ChampionshipSerializer(serializers.ModelSerializer):
     class Meta:
-        model: Championship
+        model = Championship
 
         fields = (
             "id",
